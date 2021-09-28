@@ -1,21 +1,17 @@
-from pygments import highlight
-from pygments.lexers import PythonLexer
-from pygments.formatters import TerminalFormatter
+import py_cui
+import os
 
-import curses
-import curses.textpad
-import keyboard
+def ListCurrentDir():
+    CurrentDirFiles = os.listdir()
+    FilesListMenu = base.add_scroll_menu(title="Files in Current Directory", row=1, column=1, row_span=1, column_span=1, padx=1, pady=0)
+    FilesListMenu.add_item_list(CurrentDirFiles)
 
-screen = curses.initscr()
-curses.echo()
+def exit_script():
+    exit()
 
 while True:
-    if(keyboard.is_pressed("ctrl+e")):
-        break
-    
-    screen.clear()
-    insert = curses.textpad.Textbox(screen, insert_mode=True)
-    text = insert.edit()
-    screen.refresh()
+    base = py_cui.PyCUI(3, 3)
+    base.add_key_command(py_cui.keys.KEY_CTRL_E, exit_script)
 
-curses.endwin
+    ListCurrentDir()
+    base.start
