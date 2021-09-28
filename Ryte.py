@@ -12,6 +12,8 @@ def exit_script():
 while True:
     base = py_cui.PyCUI(3, 3)
     base.add_key_command(py_cui.keys.KEY_CTRL_E, exit_script)
+    print(base.get_absolute_size())
 
     ListCurrentDir()
-    base.start
+
+    base.start()
