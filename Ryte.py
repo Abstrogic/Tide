@@ -1,21 +1,21 @@
 import py_cui
 import os
 
-def ListCurrentDir():
-    CurrentDirFiles = os.listdir()
-    FilesListMenu = base.add_scroll_menu(title="Files in Current Directory", row=0, column=1, row_span=1, column_span=1, padx=1, pady=0)
-    FilesListMenu.add_item_list(CurrentDirFiles)
+class FileSelectionList:
 
-def exit_script():
-    exit()
+    def __init__(self, base):
+        FilesListMenu = base.add_scroll_menu(title="Files in Current Directory", row=0, column=0, row_span=3, column_span=3, padx=1, pady=0)
+        FilesListMenu.add_item_list(os.listdir())
 
-while True:
-    base = py_cui.PyCUI(3, 3)
-    size = base.get_absolute_size()
-    base._refresh_height_width(size[0], size[1])
-    base.add_key_command(py_cui.keys.KEY_CTRL_E, exit_script)
-    print(base.get_absolute_size())
+class Ryte:
 
-    ListCurrentDir()
+    def __init__(self, base):
+        self.base = base
+        self.main()
 
-    base.start()
+    def main(self):
+        FileSelectionList(self.base)
+
+base = py_cui.PyCUI(3, 3)
+app = Ryte(base)
+base.start()

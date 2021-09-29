@@ -1,3 +1,2 @@
-windows-curses
-Pygments
-keyboard
+py_cui
+os
