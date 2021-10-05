@@ -24,11 +24,11 @@ class Tide:
         self.DirNav.set_color(py_cui.CYAN_ON_BLACK)
 
         # Tide Status Box (To catch and display raised exceptions)
-        self.StatusBox = self.base.add_text_block(title="Tide Status", row=4, column=0, row_span=1, column_span=5, padx=1, pady=0, initial_text="")
-        self.StatusBox.set_color(py_cui.CYAN_ON_BLACK)
+        self.StatusBox = self.base.add_text_block(title="Tide Status", row=4, column=0, row_span=1, column_span=8, padx=1, pady=0, initial_text="")
+        self.StatusBox.set_color(py_cui.GREEN_ON_BLACK)
 
         # Editing Box
-        self.EditBox = self.base.add_text_block(title="Editor", row=0, column=2, row_span=4, column_span=3, padx=1, pady=0, initial_text="")
+        self.EditBox = self.base.add_text_block(title="Editor", row=0, column=2, row_span=4, column_span=6, padx=1, pady=0, initial_text="")
         self.EditBox.set_color(py_cui.CYAN_ON_BLACK)
 
     def OpenFileOrDir(self):
@@ -75,12 +75,14 @@ class Tide:
     def UpdateStatus(self, UpdateContent):
         try:
             self.StatusBox.clear()
+            self.StatusBox.set_color(py_cui.GREEN_ON_BLACK)
             self.StatusBox.set_text(UpdateContent)
 
         except Exception:
             error = traceback.format_exc()
             self.StatusBox.set_text("Error: " + error)
+            self.StatusBox.set_color(py_cui.RED_ON_BLACK)
 
-base = py_cui.PyCUI(num_rows=5, num_cols=5)
+base = py_cui.PyCUI(num_rows=5, num_cols=8)
 app = Tide(base)
 base.start()
