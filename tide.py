@@ -24,12 +24,53 @@ class Tide:
         self.DirNav.set_color(py_cui.CYAN_ON_BLACK)
 
         # Tide Status Box (To catch and display raised exceptions)
-        self.StatusBox = self.base.add_text_block(title="Tide Status", row=4, column=0, row_span=1, column_span=8, padx=1, pady=0, initial_text="")
+        self.StatusBox = self.base.add_text_block(title="Tide Status", row=4, column=0, row_span=1, column_span=10, padx=1, pady=0, initial_text="")
         self.StatusBox.set_color(py_cui.GREEN_ON_BLACK)
 
         # Editing Box
-        self.EditBox = self.base.add_text_block(title="Editor", row=0, column=2, row_span=4, column_span=6, padx=1, pady=0, initial_text="")
+        self.EditBox = self.base.add_text_block(title="Editor", row=0, column=2, row_span=4, column_span=8, padx=1, pady=0, initial_text="")
         self.EditBox.set_color(py_cui.CYAN_ON_BLACK)
+        self.EditBox.add_key_command(py_cui.keys.KEY_CTRL_S, self.SaveOpenFile)
+
+    # Function wraps the py_cui API warning popup to make it easier to call
+    def ShowWarningPopup(self, title, msg):
+        try:
+            self.base.show_warning_popup(title, msg)
+
+        except Exception:
+            self.UpdateStatus(Exception)
+
+    # Function wraps the py_cui API error popup to make it easier to call
+    def ShowErrorPopup(self, title, msg):
+        try:
+            self.base.show_error_popup(title, msg)
+
+        except Exception:
+            self.UpdateStatus(Exception)
+
+    # Function wraps the py_cui API message popup to make it easier to call
+    def ShowMsgPopup(self, title, msg):
+        try:
+            self.base.show_message_popup(title, msg)
+
+        except Exception:
+            self.UpdateStatus(Exception)
+
+    # If file is open in editor, save the opened file
+    def SaveOpenFile(self):
+        try:
+            if(self.EditBox.get_title() != "Editor"):
+                file = open(self.EditBox.get_title(), "w")
+                file.write(self.EditBox.get())
+                file.close()
+                self.ShowMsgPopup("File Saved", "The file has been saved as: " + self.EditBox.get_title())
+                self.UpdateStatus("File Saved As: " + self.EditBox.get_title())
+            
+            else:
+                self.ShowWarningPopup("Unable to save file", "There is no file open in the editor.")
+
+        except Exception:
+            self.UpdateStatus(Exception)
 
     def OpenFileOrDir(self):
         try: 
@@ -45,7 +86,7 @@ class Tide:
                     OpenFile.close()
 
                     self.EditBox.set_text(FileData)
-                    self.EditBox.set_title("Editing File: " + path)
+                    self.EditBox.set_title(path)
                     self.UpdateStatus("Editing File: " + path)
 
                 if(os.path.isdir(path)):
@@ -79,10 +120,11 @@ class Tide:
             self.StatusBox.set_text(UpdateContent)
 
         except Exception:
+            self.ShowErrorPopup("IDE Error", "View the Tide Status Box for specifics.")
             error = traceback.format_exc()
             self.StatusBox.set_text("Error: " + error)
             self.StatusBox.set_color(py_cui.RED_ON_BLACK)
 
-base = py_cui.PyCUI(num_rows=5, num_cols=8)
+base = py_cui.PyCUI(num_rows=5, num_cols=10)
 app = Tide(base)
 base.start()
