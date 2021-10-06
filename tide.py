@@ -68,6 +68,7 @@ class Tide:
             
             else:
                 self.ShowWarningPopup("Unable to save file", "There is no file open in the editor.")
+                self.UpdateStatus("Unable to save file. There isn't a file open in the editor.")
 
         except Exception:
             self.UpdateStatus(Exception)
