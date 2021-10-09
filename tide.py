@@ -10,18 +10,20 @@ class Tide:
         self.base.set_title("Tide: Terminal Integrated Development Enviroment")
 
         # Menu that lists all of the Tide Operations
-        self.commands = ["Open File (CTRL-o)", "Locate File (CTRL-l)"]
-        self.OperationsMenu = self.base.add_scroll_menu(title="Tide Operations", row=0, column=0, row_span=2, column_span=2, padx=1, pady=0)
-        self.OperationsMenu.add_item_list(self.commands)
+        self.operations = ["Save File (CTRL-s)", "Create New File (CTRL-n)", "Refresh Editor (CTRL-r)", "Delete File (CTRL-d)"]
+        self.OperationsMenu = self.base.add_scroll_menu(title="Tide Operations List", row=0, column=0, row_span=2, column_span=2, padx=1, pady=0)
+        self.OperationsMenu.add_item_list(self.operations)
         self.OperationsMenu.set_color(py_cui.CYAN_ON_BLACK)
-        
+        self.OperationsMenu.add_key_command(py_cui.keys.KEY_ENTER, self.OperationsMenuFunction)
 
         # Menu that lists files in current directory, displayed on the left of Tide GUI
         self.DirNav = self.base.add_scroll_menu(title="Directory Navigation", row=2, column=0, row_span=2, column_span=2, padx=1, pady=0)
         self.DirNav.add_item_list(os.listdir())
+        self.DirNav.set_color(py_cui.CYAN_ON_BLACK)
         self.DirNav.add_key_command(py_cui.keys.KEY_ENTER, self.OpenFileOrDir)
         self.DirNav.add_key_command(py_cui.keys.KEY_BACKSPACE, self.ChangeToParentDir)
-        self.DirNav.set_color(py_cui.CYAN_ON_BLACK)
+        self.DirNav.add_key_command(py_cui.keys.KEY_CTRL_D, self.DeleteFile)
+
 
         # Tide Status Box (To catch and display raised exceptions)
         self.StatusBox = self.base.add_text_block(title="Tide Status", row=4, column=0, row_span=1, column_span=10, padx=1, pady=0, initial_text="")
@@ -31,6 +33,30 @@ class Tide:
         self.EditBox = self.base.add_text_block(title="Editor", row=0, column=2, row_span=4, column_span=8, padx=1, pady=0, initial_text="")
         self.EditBox.set_color(py_cui.CYAN_ON_BLACK)
         self.EditBox.add_key_command(py_cui.keys.KEY_CTRL_S, self.SaveOpenFile)
+        self.EditBox.add_key_command(py_cui.keys.KEY_CTRL_N, self.CreateNewFilePrompt)
+        self.EditBox.add_key_command(py_cui.keys.KEY_CTRL_R, self.RefreshEditBox)
+
+    def OperationsMenuFunction(self):
+        try:
+            SelectedOperation = self.OperationsMenu.get()
+
+            for AvailableOperations in self.operations:
+                if(AvailableOperations == SelectedOperation):
+
+                    # Save File
+                    if(SelectedOperation == self.operations[0]):
+                        self.SaveOpenFile()
+
+                    # Create New File
+                    if(SelectedOperation == self.operations[1]):
+                        self.CreateNewFilePrompt()
+
+                    # Refresh Edit Box
+                    if(SelectedOperation == self.operations[2]):
+                        self.RefreshEditBox()
+
+        except Exception:
+            self.UpdateStatus(Exception)
 
     # Function wraps the py_cui API warning popup to make it easier to call
     def ShowWarningPopup(self, title, msg):
@@ -56,6 +82,17 @@ class Tide:
         except Exception:
             self.UpdateStatus(Exception)
 
+    def DeleteFile(self):
+        try:
+            file = self.DirNav.get()
+            path = os.path.abspath(file)
+
+            if(os.path.exists(path)):
+                os.remove(path)
+
+        except Exception:
+            self.UpdateStatus(Exception)
+
     # If file is open in editor, save the opened file
     def SaveOpenFile(self):
         try:
@@ -69,6 +106,33 @@ class Tide:
             else:
                 self.ShowWarningPopup("Unable to save file", "There is no file open in the editor.")
                 self.UpdateStatus("Unable to save file. There isn't a file open in the editor.")
+
+        except Exception:
+            self.UpdateStatus(Exception)
+
+    def CreateNewFile(self, file):
+        try:
+            f = open(file, "x")
+            f.write(self.EditBox.get())
+            f.close()
+            self.DirNav.clear()
+            self.DirNav.add_item_list(os.listdir())
+
+        except Exception:
+            self.UpdateStatus(Exception)
+
+    def CreateNewFilePrompt(self):
+        try:
+            if(self.EditBox.get_title() == "Editor"):
+                self.base.show_text_box_popup("File to save name: ", self.CreateNewFile)
+
+        except Exception:
+            self.UpdateStatus(Exception)
+
+    def RefreshEditBox(self):
+        try:
+            self.EditBox.clear()
+            self.EditBox.set_title("Editor")
 
         except Exception:
             self.UpdateStatus(Exception)
