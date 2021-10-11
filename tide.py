@@ -2,7 +2,7 @@ from genericpath import isdir, isfile
 import traceback
 import py_cui
 import os
-import argparse
+import sys
 
 class Tide:
 
@@ -213,14 +213,30 @@ class Tide:
             self.StatusBox.set_color(py_cui.RED_ON_BLACK)
 
 def ParseCMDArgs():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-startdir", help="Directory to start Tide in.", type=str)
-    args = vars(parser.parse_args())
+    try:
+        if(len(sys.argv) == int("2")):
+            if(os.path.isdir(sys.argv[1])):
+                return(sys.argv[1])
 
-    print(args)
+            elif(os.path.isfile(sys.argv[1])):
+                return(sys.argv[1])
 
-ParseCMDArgs()
+            else:
+                print("Tide Initialization Error: the directory " + sys.argv[1] + " does not exist.")
+                print("Cancelling Tide Initialization.")
+                exit()
+
+        elif(len(sys.argv) == int("1")):
+            return(".")
+
+        else:
+            print("Invalid number of arguments.")
+
+    except Exception:
+        print("Tide Initialization Error: " + Exception)
+
+DirArg = ParseCMDArgs()
 
 base = py_cui.PyCUI(num_rows=7, num_cols=10)
-app = Tide(base, startdir="D:\Stuff\PythonProjects\Tide\py_cui-docs")
+app = Tide(base, startdir=DirArg)
 base.start()
