@@ -7,9 +7,19 @@ import sys
 class Tide:
 
     def __init__(self, base, startdir):
-
         try:
-            os.chdir(dir)
+            if(os.path.isdir(startdir)):
+                os.chdir(startdir)
+
+            elif(os.path.isfile(startdir)):
+                FileAbsPath = os.path.abspath(startdir)
+                f = open(FileAbsPath, "r")
+                FileData = f.read()
+                f.close()
+
+                self.EditBox.set_text(FileData)
+                self.EditBox.set_title(FileAbsPath)
+                self.UpdateStatus("Editing File: " + FileAbsPath)
 
         except Exception:
             self.UpdateStatus(Exception)
@@ -222,7 +232,8 @@ def ParseCMDArgs():
                 return(sys.argv[1])
 
             else:
-                print("Tide Initialization Error: the directory " + sys.argv[1] + " does not exist.")
+                print("Tide Initialization Error: ")
+                print("This directory does not exist: " + sys.argv[1])
                 print("Cancelling Tide Initialization.")
                 exit()
 
@@ -236,6 +247,8 @@ def ParseCMDArgs():
         print("Tide Initialization Error: " + Exception)
 
 DirArg = ParseCMDArgs()
+
+print("Starting Tide in this directory: " + DirArg)
 
 base = py_cui.PyCUI(num_rows=7, num_cols=10)
 app = Tide(base, startdir=DirArg)
