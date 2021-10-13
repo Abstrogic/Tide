@@ -1,4 +1,4 @@
-from genericpath import isdir, isfile
+from genericpath import isfile
 import traceback
 import py_cui
 import os
@@ -7,23 +7,6 @@ import sys
 class Tide:
 
     def __init__(self, base, startdir):
-        try:
-            if(os.path.isdir(startdir)):
-                os.chdir(startdir)
-
-            elif(os.path.isfile(startdir)):
-                FileAbsPath = os.path.abspath(startdir)
-                f = open(FileAbsPath, "r")
-                FileData = f.read()
-                f.close()
-
-                self.EditBox.set_text(FileData)
-                self.EditBox.set_title(FileAbsPath)
-                self.UpdateStatus("Editing File: " + FileAbsPath)
-
-        except Exception:
-            self.UpdateStatus(Exception)
-
         self.base = base
         self.base.set_title("Tide: Terminal Integrated Development Enviroment")
 
@@ -53,6 +36,37 @@ class Tide:
         self.EditBox.add_key_command(py_cui.keys.KEY_CTRL_S, self.SaveOpenFile)
         self.EditBox.add_key_command(py_cui.keys.KEY_CTRL_N, self.CreateNewFilePrompt)
         self.EditBox.add_key_command(py_cui.keys.KEY_CTRL_R, self.RefreshEditBox)
+        self.EditBox.add_key_command(py_cui.keys.KEY_CTRL_Q, self.QuickDirectoryChange)
+
+        try:
+            if(os.path.isdir(startdir)):
+                AbsolutePath = os.path.abspath(startdir)
+                self.ChangeDirectory(AbsolutePath)
+
+            elif(os.path.isfile(startdir)):
+                FileAbsPath = os.path.abspath(startdir)
+                self.OpenFile(FileAbsPath)
+
+        except Exception:
+            self.UpdateStatus(Exception)
+
+    def QuickDirectoryChange(self):
+        try:
+            def QuickDirChange(dir):
+                AbsolutePath = os.path.abspath(dir)
+
+                if(os.path.isdir(AbsolutePath)):
+                    self.ChangeDirectory(AbsolutePath)
+                    self.UpdateStatus("Quick Directory Change Success. Changed to directory: " + AbsolutePath)
+
+                elif(os.path.isfile(AbsolutePath)):
+                    self.OpenFile(AbsolutePath)
+                    self.UpdateStatus("Quick File Edit Success. Editing File: " + AbsolutePath)
+
+            self.base.show_text_box_popup("Directory or file to navigate to: ", QuickDirChange)
+
+        except Exception:
+            self.UpdateStatus(Exception)
 
     def OperationsMenuFunction(self):
         try:
@@ -76,6 +90,10 @@ class Tide:
                     # Delete File
                     if(SelectedOperation == self.operations[3]):
                         self.DeleteFile()
+
+                    # Quick Directory Change
+                    if(SelectedOperation == self.operations[4]):
+                        self.QuickDirectoryChange()
 
         except Exception:
             self.UpdateStatus(Exception)
@@ -178,21 +196,36 @@ class Tide:
             if(os.path.exists(path)):
 
                 if(os.path.isfile(path)):
-                    OpenFile = open(path, "r")
-                    FileData = OpenFile.read()
-                    OpenFile.close()
-
-                    self.EditBox.set_text(FileData)
-                    self.EditBox.set_title(path)
-                    self.UpdateStatus("Editing File: " + path)
+                    self.OpenFile(path)
 
                 if(os.path.isdir(path)):
-                    os.chdir(path)
-                    cwd = os.getcwd()
-                    files = os.listdir()
-                    self.DirNav.clear()
-                    self.DirNav.add_item_list(files)
-                    self.UpdateStatus("Navigated to new directory: " + path)
+                    self.ChangeDirectory(path)
+
+        except Exception:
+            self.UpdateStatus(Exception)
+
+    def ChangeDirectory(self, dir):
+        try:
+            os.chdir(dir)
+            cwd = os.getcwd()
+            files = os.listdir()
+            self.DirNav.clear()
+            self.DirNav.add_item_list(files)
+            self.UpdateStatus("Navigated to new directory: " + dir)
+
+        except Exception:
+            self.UpdateStatus(Exception)
+
+    def OpenFile(self, file):
+        try:
+            if(os.path.isfile(file)):
+                OpenFile = open(file, "r")
+                FileData = OpenFile.read()
+                OpenFile.close()
+
+                self.EditBox.set_text(FileData)
+                self.EditBox.set_title(file)
+                self.UpdateStatus("Editing File: " + file)
 
         except Exception:
             self.UpdateStatus(Exception)
@@ -201,11 +234,9 @@ class Tide:
         try:
             ParentDir = os.path.dirname(os.getcwd())
             ParentDirAbsPath = os.path.abspath(ParentDir)
+
             if(os.path.isdir(ParentDirAbsPath)):
-                os.chdir(ParentDirAbsPath)
-                files = os.listdir()
-                self.DirNav.clear()
-                self.DirNav.add_item_list(files)
+                self.ChangeDirectory(ParentDirAbsPath)
 
         except Exception:
             self.UpdateStatus(Exception)
