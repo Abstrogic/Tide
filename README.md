@@ -2,7 +2,7 @@
 
 **Tide** is a lightweight terminal-based text editor that has rudimentary IDE functions. It allows for the user to quickly navigate between directories and also create, modify and delete files. The text editor is programmed in Python and uses the **[py_cui](https://github.com/jwlodek/py_cui)** library to create its TUI (terminal user interface).
 
-![Tide in action.](\images\Editing.png)
+![Tide in action.](/images/Editing.png)
 
 ## Features
 
