@@ -18,4 +18,12 @@ No need! Just make sure you have the **py_cui** library installed within your lo
 
 Tide can be used simply by running `python3 tide.py` in the directory containing the "tide.py" file. Or, you can specify which directory to start Tide in by running `python3 tide.py [directory]` . For example, you could start Tide in the directory `/usr/bin` by running `python3 tide.py /usr/bin` (assuming this is a Linux machine). 
 
+## Github Repository Structure
+
+The Github repository of this project consists of 2 files and 1 folder:
+
+1. `tide.py` is the project itself. This file is the complete text editor.
+2. `README.md` is this file, it is the project documentation.
+3. `images` is a folder containing images of the text editor in action.
+
 Written on 2021/10/13
